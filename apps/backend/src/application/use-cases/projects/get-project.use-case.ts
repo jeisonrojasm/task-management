@@ -1,6 +1,7 @@
-import type { ProjectRepository } from '../../../domain/repositories/project.repository.js'
 import { ProjectNotFoundError } from '../../../domain/errors/project-not-found.error.js'
 import { toProjectOutput, type ProjectOutput } from '../../dtos/project.dto.js'
+
+import type { ProjectRepository } from '../../../domain/repositories/project.repository.js'
 
 export class GetProjectUseCase {
   constructor(private readonly projectRepository: ProjectRepository) {}

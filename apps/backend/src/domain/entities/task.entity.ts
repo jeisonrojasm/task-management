@@ -1,16 +1,16 @@
-import type { TaskStatus } from '../value-objects/task-status.js';
-import type { Priority } from '../value-objects/priority.js';
+import type { TaskStatus } from '../value-objects/task-status.js'
+import type { Priority } from '../value-objects/priority.js'
 
 export interface Task {
-  id: string;
-  projectId: string;
-  title: string;
-  description: string | null;
-  status: TaskStatus;
-  priority: Priority;
-  dueDate: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  id: string
+  projectId: string
+  title: string
+  description: string | null
+  status: TaskStatus
+  priority: Priority
+  dueDate: Date | null
+  createdAt: Date
+  updatedAt: Date
 }
 
 const VALID_TRANSITIONS: Record<TaskStatus, readonly TaskStatus[]> = {
@@ -19,17 +19,14 @@ const VALID_TRANSITIONS: Record<TaskStatus, readonly TaskStatus[]> = {
   IN_REVIEW: ['DONE', 'IN_PROGRESS', 'CANCELLED'],
   DONE: [],
   CANCELLED: [],
-};
+}
 
-export function canTransitionTo(
-  currentStatus: TaskStatus,
-  newStatus: TaskStatus,
-): boolean {
-  return (VALID_TRANSITIONS[currentStatus] ?? []).includes(newStatus);
+export function canTransitionTo(currentStatus: TaskStatus, newStatus: TaskStatus): boolean {
+  return (VALID_TRANSITIONS[currentStatus] ?? []).includes(newStatus)
 }
 
 export function isTaskOverdue(task: Task): boolean {
-  if (task.dueDate === null) return false;
-  if (task.status === 'DONE' || task.status === 'CANCELLED') return false;
-  return task.dueDate < new Date();
+  if (task.dueDate === null) return false
+  if (task.status === 'DONE' || task.status === 'CANCELLED') return false
+  return task.dueDate < new Date()
 }

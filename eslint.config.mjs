@@ -4,7 +4,7 @@ import eslint from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
-import importPlugin from 'eslint-plugin-import'
+import importPlugin from 'eslint-plugin-import-x'
 import prettierPlugin from 'eslint-plugin-prettier'
 import prettierConfig from 'eslint-config-prettier'
 
@@ -12,7 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '*.js'],
+    ignores: ['**/dist/**', '**/node_modules/**', '*.js', '**/prisma/**'],
   },
   eslint.configs.recommended,
   tseslint.configs.recommended,
@@ -20,7 +20,7 @@ export default tseslint.config(
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parserOptions: {
-        project: true,
+        projectService: true,
         tsconfigRootDir: __dirname,
       },
     },
@@ -33,6 +33,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
       'no-console': 'error',
+      'import/no-duplicates': ['error', { 'prefer-inline': true }],
       'import/order': [
         'error',
         {
