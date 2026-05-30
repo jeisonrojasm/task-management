@@ -20,7 +20,7 @@ export class ListProjectsUseCase {
     const sort = input.sort ?? 'createdAt'
 
     if (limit > MAX_LIMIT) {
-      throw new DomainError(`Limit cannot exceed ${MAX_LIMIT}.`, ERROR_CODE.VALIDATION_ERROR)
+      throw new DomainError(`El límite no puede superar ${MAX_LIMIT}.`, ERROR_CODE.VALIDATION_ERROR)
     }
 
     const status: ProjectStatus = input.status === 'ARCHIVED' ? 'ARCHIVED' : 'ACTIVE'

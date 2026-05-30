@@ -26,7 +26,11 @@ export function canTransitionTo(currentStatus: TaskStatus, newStatus: TaskStatus
 }
 
 export function isTaskOverdue(task: Task): boolean {
-  if (task.dueDate === null) return false
-  if (task.status === 'DONE' || task.status === 'CANCELLED') return false
+  if (task.dueDate === null) {
+    return false
+  }
+  if (task.status === 'DONE' || task.status === 'CANCELLED') {
+    return false
+  }
   return task.dueDate < new Date()
 }
