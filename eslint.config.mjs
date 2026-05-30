@@ -67,4 +67,12 @@ export default tseslint.config(
     },
   },
   prettierConfig,
+  {
+    // curly: "all" is compatible with Prettier (Prettier never removes braces).
+    // It must come after prettierConfig because eslint-config-prettier disables curly entirely.
+    files: ['**/*.ts', '**/*.tsx'],
+    rules: {
+      curly: ['error', 'all'],
+    },
+  },
 )

@@ -12,7 +12,10 @@ export class CreateProjectUseCase {
 
   async execute(input: CreateProjectInput): Promise<ProjectOutput> {
     if (input.name.trim().length === 0) {
-      throw new DomainError('Project name cannot be empty.', ERROR_CODE.VALIDATION_ERROR)
+      throw new DomainError(
+        'El nombre del proyecto no puede estar vacío.',
+        ERROR_CODE.VALIDATION_ERROR,
+      )
     }
 
     const project = await this.projectRepository.create({

@@ -29,14 +29,14 @@ export class ListProjectTasksUseCase {
     const order: 'asc' | 'desc' = input.order === 'asc' ? 'asc' : 'desc'
 
     if (limit > MAX_LIMIT) {
-      throw new DomainError(`Limit cannot exceed ${MAX_LIMIT}.`, ERROR_CODE.VALIDATION_ERROR)
+      throw new DomainError(`El límite no puede superar ${MAX_LIMIT}.`, ERROR_CODE.VALIDATION_ERROR)
     }
 
     let status: TaskStatus | undefined
     if (input.status !== undefined) {
       if (!isValidTaskStatus(input.status)) {
         throw new DomainError(
-          `Invalid task status: '${input.status}'.`,
+          `Estado de tarea no válido: '${input.status}'.`,
           ERROR_CODE.VALIDATION_ERROR,
         )
       }
@@ -47,7 +47,7 @@ export class ListProjectTasksUseCase {
     if (input.priority !== undefined) {
       if (!isValidPriority(input.priority)) {
         throw new DomainError(
-          `Invalid priority value: '${input.priority}'.`,
+          `Valor de prioridad no válido: '${input.priority}'.`,
           ERROR_CODE.VALIDATION_ERROR,
         )
       }

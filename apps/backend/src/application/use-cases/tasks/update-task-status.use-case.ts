@@ -19,7 +19,7 @@ export class UpdateTaskStatusUseCase {
 
     if (!isValidTaskStatus(input.newStatus)) {
       throw new DomainError(
-        `Invalid task status: '${input.newStatus}'.`,
+        `Estado de tarea no válido: '${input.newStatus}'.`,
         ERROR_CODE.VALIDATION_ERROR,
       )
     }

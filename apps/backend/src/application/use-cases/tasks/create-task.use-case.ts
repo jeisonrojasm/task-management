@@ -16,7 +16,10 @@ export class CreateTaskUseCase {
 
   async execute(input: CreateTaskInput): Promise<TaskOutput> {
     if (input.title.trim().length === 0) {
-      throw new DomainError('Task title cannot be empty.', ERROR_CODE.VALIDATION_ERROR)
+      throw new DomainError(
+        'El título de la tarea no puede estar vacío.',
+        ERROR_CODE.VALIDATION_ERROR,
+      )
     }
 
     const project = await this.projectRepository.findById(input.projectId)
@@ -33,7 +36,7 @@ export class CreateTaskUseCase {
     if (input.priority !== undefined) {
       if (!isValidPriority(input.priority)) {
         throw new DomainError(
-          `Invalid priority value: '${input.priority}'.`,
+          `Valor de prioridad no válido: '${input.priority}'.`,
           ERROR_CODE.VALIDATION_ERROR,
         )
       }
