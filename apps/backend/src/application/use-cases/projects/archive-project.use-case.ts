@@ -1,7 +1,8 @@
-import type { ProjectRepository } from '../../../domain/repositories/project.repository.js'
 import { ProjectNotFoundError } from '../../../domain/errors/project-not-found.error.js'
 import { isProjectArchived } from '../../../domain/entities/project.entity.js'
 import { toProjectOutput, type ProjectOutput } from '../../dtos/project.dto.js'
+
+import type { ProjectRepository } from '../../../domain/repositories/project.repository.js'
 
 export class ArchiveProjectUseCase {
   constructor(private readonly projectRepository: ProjectRepository) {}

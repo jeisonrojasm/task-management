@@ -1,6 +1,6 @@
-export type ProjectStatus = 'ACTIVE' | 'ARCHIVED';
+export type ProjectStatus = 'ACTIVE' | 'ARCHIVED'
 
 export const PROJECT_STATUS = {
   ACTIVE: 'ACTIVE',
   ARCHIVED: 'ARCHIVED',
-} as const satisfies Record<string, ProjectStatus>;
+} as const satisfies Record<string, ProjectStatus>

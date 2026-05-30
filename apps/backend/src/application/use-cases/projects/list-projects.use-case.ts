@@ -1,8 +1,13 @@
+import { DomainError, ERROR_CODE } from '../../../domain/errors/domain.error.js'
+import {
+  toProjectWithStatsOutput,
+  type ListProjectsInput,
+  type ProjectWithStatsOutput,
+} from '../../dtos/project.dto.js'
+
 import type { PaginatedResult } from '../../../domain/shared-types.js'
 import type { ProjectRepository } from '../../../domain/repositories/project.repository.js'
 import type { ProjectStatus } from '../../../domain/value-objects/project-status.js'
-import { DomainError } from '../../../domain/errors/domain.error.js'
-import { toProjectWithStatsOutput, type ListProjectsInput, type ProjectWithStatsOutput } from '../../dtos/project.dto.js'
 
 const MAX_LIMIT = 100
 
@@ -15,7 +20,7 @@ export class ListProjectsUseCase {
     const sort = input.sort ?? 'createdAt'
 
     if (limit > MAX_LIMIT) {
-      throw new DomainError(`Limit cannot exceed ${MAX_LIMIT}.`, 'VALIDATION_ERROR')
+      throw new DomainError(`Limit cannot exceed ${MAX_LIMIT}.`, ERROR_CODE.VALIDATION_ERROR)
     }
 
     const status: ProjectStatus = input.status === 'ARCHIVED' ? 'ARCHIVED' : 'ACTIVE'
