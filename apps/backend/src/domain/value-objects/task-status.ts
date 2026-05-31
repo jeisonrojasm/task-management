@@ -8,13 +8,7 @@ export const TASK_STATUS = {
   CANCELLED: 'CANCELLED',
 } as const satisfies Record<string, TaskStatus>
 
-export const TASK_STATUS_VALUES: readonly TaskStatus[] = [
-  'TODO',
-  'IN_PROGRESS',
-  'IN_REVIEW',
-  'DONE',
-  'CANCELLED',
-] as const
+export const TASK_STATUS_VALUES = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE', 'CANCELLED'] as const
 
 export function isValidTaskStatus(value: unknown): value is TaskStatus {
   return TASK_STATUS_VALUES.some((s) => s === value)

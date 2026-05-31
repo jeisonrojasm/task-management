@@ -3,7 +3,7 @@ import { DomainError, ERROR_CODE } from '../../../domain/errors/domain.error.js'
 import type { Request, Response, NextFunction } from 'express'
 import type { ZodSchema } from 'zod'
 
-export function validateQuery<T extends Request['query']>(schema: ZodSchema<T>) {
+export function validateQuery<T>(schema: ZodSchema<T>) {
   return (req: Request, _res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.query)
     if (!result.success) {
@@ -23,7 +23,8 @@ export function validateQuery<T extends Request['query']>(schema: ZodSchema<T>) 
       next(new DomainError('Validation failed.', ERROR_CODE.VALIDATION_ERROR, details))
       return
     }
-    req.query = result.data
+    // Zod may coerce string query params (e.g. page→number), which Express types don't reflect.
+    req.query = result.data as unknown as Request['query']
     next()
   }
 }
