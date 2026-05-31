@@ -20,7 +20,16 @@ export default tseslint.config(
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: [
+            'apps/backend/src/domain/entities/*.spec.ts',
+            'apps/backend/src/application/use-cases/projects/*.spec.ts',
+            'apps/backend/src/application/use-cases/tasks/*.spec.ts',
+            'apps/backend/src/presentation/http/routes/*.spec.ts',
+          ],
+          defaultProject: 'apps/backend/tsconfig.test.json',
+          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 11,
+        },
         tsconfigRootDir: __dirname,
       },
     },
