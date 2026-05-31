@@ -22,13 +22,15 @@ export default tseslint.config(
       parserOptions: {
         projectService: {
           allowDefaultProject: [
+            'apps/backend/jest.config.ts',
+            'apps/backend/jest.integration.config.ts',
             'apps/backend/src/domain/entities/*.spec.ts',
             'apps/backend/src/application/use-cases/projects/*.spec.ts',
             'apps/backend/src/application/use-cases/tasks/*.spec.ts',
             'apps/backend/src/presentation/http/routes/*.spec.ts',
           ],
           defaultProject: 'apps/backend/tsconfig.test.json',
-          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 11,
+          maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 15,
         },
         tsconfigRootDir: __dirname,
       },
@@ -61,6 +63,12 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*.cjs'],
+    languageOptions: {
+      sourceType: 'commonjs',
+    },
+  },
+  {
     files: ['apps/frontend/**/*.ts', 'apps/frontend/**/*.tsx'],
     plugins: {
       react: reactPlugin,
@@ -72,6 +80,7 @@ export default tseslint.config(
       },
     },
     rules: {
+      'no-console': ['error', { allow: ['info'] }],
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'error',
     },

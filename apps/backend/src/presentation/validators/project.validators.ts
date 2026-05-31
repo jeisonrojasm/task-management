@@ -3,12 +3,12 @@ import { z } from 'zod'
 import { PROJECT_STATUS_VALUES } from '../../domain/value-objects/project-status.js'
 
 export const CreateProjectSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255),
+  name: z.string().min(1, 'El nombre es obligatorio').max(255),
   description: z.string().max(1000).optional(),
 })
 
 export const UpdateProjectSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(255),
+  name: z.string().min(1, 'El nombre es obligatorio').max(255),
   description: z.string().max(1000).nullable(),
 })
 
