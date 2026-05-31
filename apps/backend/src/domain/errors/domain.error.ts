@@ -11,10 +11,12 @@ export type ErrorCode = (typeof ERROR_CODE)[keyof typeof ERROR_CODE]
 
 export class DomainError extends Error {
   public readonly code: ErrorCode
+  public readonly details: Record<string, string[]> | null
 
-  constructor(message: string, code: ErrorCode) {
+  constructor(message: string, code: ErrorCode, details: Record<string, string[]> | null = null) {
     super(message)
     this.code = code
+    this.details = details
     this.name = 'DomainError'
   }
 }
