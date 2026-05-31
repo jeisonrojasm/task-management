@@ -1,7 +1,9 @@
 import 'dotenv/config'
 
+import { fileURLToPath } from 'url'
+
 import { z } from 'zod'
-import express, { type Request, type Response } from 'express'
+import express, { type Request, type Response, type Express } from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
@@ -35,10 +37,6 @@ import { globalRateLimiter } from './presentation/http/middlewares/rate-limiter.
 import { errorHandlerMiddleware } from './presentation/http/middlewares/error-handler.middleware.js'
 import { swaggerSpec } from './presentation/http/docs/swagger.config.js'
 
-// ---------------------------------------------------------------------------
-// 1. Validate environment variables
-// ---------------------------------------------------------------------------
-
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.coerce.number().default(3000),
@@ -51,147 +49,158 @@ const EnvSchema = z.object({
   LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error']).default('info'),
 })
 
-const envResult = EnvSchema.safeParse(process.env)
+export async function createApp(): Promise<Express> {
+  // ---------------------------------------------------------------------------
+  // 1. Validate environment variables
+  // ---------------------------------------------------------------------------
 
-if (!envResult.success) {
-  const errors = envResult.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`)
-  logger.error({ errors }, 'Invalid environment variables — server will not start')
-  process.exit(1)
-}
+  const envResult = EnvSchema.safeParse(process.env)
 
-const env = envResult.data
+  if (!envResult.success) {
+    const errors = envResult.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`)
+    logger.error({ errors }, 'Invalid environment variables — server will not start')
+    throw new Error('Invalid environment variables')
+  }
 
-// ---------------------------------------------------------------------------
-// 2. Resolve AI provider
-// ---------------------------------------------------------------------------
+  const env = envResult.data
 
-const aiProvider =
-  env.OPENAI_API_KEY !== undefined ? new OpenAIProvider(env.OPENAI_API_KEY) : new MockAIProvider()
+  // ---------------------------------------------------------------------------
+  // 2. Resolve AI provider
+  // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// 3. Instantiate repositories
-// ---------------------------------------------------------------------------
+  const aiProvider =
+    env.OPENAI_API_KEY !== undefined ? new OpenAIProvider(env.OPENAI_API_KEY) : new MockAIProvider()
 
-const projectRepository = new PrismaProjectRepository()
-const taskRepository = new PrismaTaskRepository()
+  // ---------------------------------------------------------------------------
+  // 3. Instantiate repositories
+  // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// 4. Instantiate use cases
-// ---------------------------------------------------------------------------
+  const projectRepository = new PrismaProjectRepository()
+  const taskRepository = new PrismaTaskRepository()
 
-const listProjectsUseCase = new ListProjectsUseCase(projectRepository)
-const getProjectUseCase = new GetProjectUseCase(projectRepository)
-const createProjectUseCase = new CreateProjectUseCase(projectRepository)
-const updateProjectUseCase = new UpdateProjectUseCase(projectRepository)
-const archiveProjectUseCase = new ArchiveProjectUseCase(projectRepository)
-const getProjectStatsUseCase = new GetProjectStatsUseCase(
-  projectRepository,
-  taskRepository,
-  aiProvider,
-)
+  // ---------------------------------------------------------------------------
+  // 4. Instantiate use cases
+  // ---------------------------------------------------------------------------
 
-const createTaskUseCase = new CreateTaskUseCase(projectRepository, taskRepository)
-const getTaskUseCase = new GetTaskUseCase(taskRepository)
-const updateTaskUseCase = new UpdateTaskUseCase(taskRepository)
-const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository)
-const updateTaskStatusUseCase = new UpdateTaskStatusUseCase(taskRepository)
-const listProjectTasksUseCase = new ListProjectTasksUseCase(projectRepository, taskRepository)
+  const listProjectsUseCase = new ListProjectsUseCase(projectRepository)
+  const getProjectUseCase = new GetProjectUseCase(projectRepository)
+  const createProjectUseCase = new CreateProjectUseCase(projectRepository)
+  const updateProjectUseCase = new UpdateProjectUseCase(projectRepository)
+  const archiveProjectUseCase = new ArchiveProjectUseCase(projectRepository)
+  const getProjectStatsUseCase = new GetProjectStatsUseCase(
+    projectRepository,
+    taskRepository,
+    aiProvider,
+  )
 
-// ---------------------------------------------------------------------------
-// 5. Instantiate controllers
-// ---------------------------------------------------------------------------
+  const createTaskUseCase = new CreateTaskUseCase(projectRepository, taskRepository)
+  const getTaskUseCase = new GetTaskUseCase(taskRepository)
+  const updateTaskUseCase = new UpdateTaskUseCase(taskRepository)
+  const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository)
+  const updateTaskStatusUseCase = new UpdateTaskStatusUseCase(taskRepository)
+  const listProjectTasksUseCase = new ListProjectTasksUseCase(projectRepository, taskRepository)
 
-const projectController = new ProjectController(
-  listProjectsUseCase,
-  getProjectUseCase,
-  createProjectUseCase,
-  updateProjectUseCase,
-  archiveProjectUseCase,
-  getProjectStatsUseCase,
-)
+  // ---------------------------------------------------------------------------
+  // 5. Instantiate controllers
+  // ---------------------------------------------------------------------------
 
-const taskController = new TaskController(
-  createTaskUseCase,
-  getTaskUseCase,
-  updateTaskUseCase,
-  deleteTaskUseCase,
-  updateTaskStatusUseCase,
-  listProjectTasksUseCase,
-)
+  const projectController = new ProjectController(
+    listProjectsUseCase,
+    getProjectUseCase,
+    createProjectUseCase,
+    updateProjectUseCase,
+    archiveProjectUseCase,
+    getProjectStatsUseCase,
+  )
 
-// ---------------------------------------------------------------------------
-// 6. Build Express app
-// ---------------------------------------------------------------------------
+  const taskController = new TaskController(
+    createTaskUseCase,
+    getTaskUseCase,
+    updateTaskUseCase,
+    deleteTaskUseCase,
+    updateTaskStatusUseCase,
+    listProjectTasksUseCase,
+  )
 
-const app = express()
+  // ---------------------------------------------------------------------------
+  // 6. Build Express app
+  // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// 7. Register middlewares in order
-// ---------------------------------------------------------------------------
+  const app = express()
 
-app.use(helmet())
-app.use(correlationIdMiddleware)
-app.use(
-  cors({
-    origin: env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()),
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID'],
-  }),
-)
-app.use(express.json())
-app.use(requestLoggerMiddleware)
-app.use(globalRateLimiter)
+  // ---------------------------------------------------------------------------
+  // 7. Register middlewares in order
+  // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// 8. Mount routers
-// ---------------------------------------------------------------------------
+  app.use(helmet())
+  app.use(correlationIdMiddleware)
+  app.use(
+    cors({
+      origin: env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()),
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Correlation-ID'],
+    }),
+  )
+  app.use(express.json())
+  app.use(requestLoggerMiddleware)
+  app.use(globalRateLimiter)
 
-app.use('/api/v1/projects', createProjectRouter(projectController, taskController))
-app.use('/api/v1/tasks', createTaskRouter(taskController))
+  // ---------------------------------------------------------------------------
+  // 8. Mount routers
+  // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// 9. Swagger UI (non-production only)
-// ---------------------------------------------------------------------------
+  app.use('/api/v1/projects', createProjectRouter(projectController, taskController))
+  app.use('/api/v1/tasks', createTaskRouter(taskController))
 
-if (env.NODE_ENV !== 'production') {
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
-  logger.info('Swagger UI available at /api/docs')
-}
+  // ---------------------------------------------------------------------------
+  // 9. Swagger UI (non-production only)
+  // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-// 10. 404 handler
-// ---------------------------------------------------------------------------
+  if (env.NODE_ENV !== 'production') {
+    app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+    logger.info('Swagger UI available at /api/docs')
+  }
 
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    error: {
-      code: 'NOT_FOUND',
-      message: `Route ${req.method} ${req.path} not found.`,
-      details: null,
-    },
+  // ---------------------------------------------------------------------------
+  // 10. 404 handler
+  // ---------------------------------------------------------------------------
+
+  app.use((req: Request, res: Response) => {
+    res.status(404).json({
+      error: {
+        code: 'NOT_FOUND',
+        message: `Route ${req.method} ${req.path} not found.`,
+        details: null,
+      },
+    })
   })
-})
 
-// ---------------------------------------------------------------------------
-// 11. Error handler (must be last)
-// ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // 11. Error handler (must be last)
+  // ---------------------------------------------------------------------------
 
-app.use(errorHandlerMiddleware)
+  app.use(errorHandlerMiddleware)
 
-// ---------------------------------------------------------------------------
-// 12. Start server
-// ---------------------------------------------------------------------------
-
-async function bootstrap(): Promise<void> {
-  await prisma.$connect()
-  logger.info('Database connected')
-
-  app.listen(env.PORT, () => {
-    logger.info({ port: env.PORT, env: env.NODE_ENV }, 'Server started')
-  })
+  return app
 }
 
-bootstrap().catch((err: unknown) => {
-  logger.error(err, 'Fatal error during bootstrap')
-  process.exit(1)
-})
+// ---------------------------------------------------------------------------
+// 12. Start server only when executed directly
+// ---------------------------------------------------------------------------
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const port = Number(process.env['PORT'] ?? 3000)
+
+  void createApp()
+    .then(async (app) => {
+      await prisma.$connect()
+      logger.info('Database connected')
+      app.listen(port, () => {
+        logger.info({ port, env: process.env['NODE_ENV'] }, 'Server started')
+      })
+    })
+    .catch((err: unknown) => {
+      logger.error(err, 'Fatal error during bootstrap')
+      process.exit(1)
+    })
+}

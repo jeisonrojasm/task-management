@@ -28,19 +28,25 @@ export class GetProjectStatsUseCase {
 
     const completionRate = taskCount > 0 ? (byStatus['DONE'] ?? 0) / taskCount : 0
 
-    const insights = await this.aiProvider.generateProjectInsights({
-      projectName: project.name,
-      taskCount,
-      byStatus,
-      byPriority,
-      overdueCount,
-      completionRate,
-    })
+    let aiInsights: ProjectStatsOutput['aiInsights'] = null
 
-    const aiInsights: ProjectStatsOutput['aiInsights'] = {
-      summary: insights.summary,
-      recommendations: insights.recommendations,
-      generatedAt: insights.generatedAt.toISOString(),
+    try {
+      const insights = await this.aiProvider.generateProjectInsights({
+        projectName: project.name,
+        taskCount,
+        byStatus,
+        byPriority,
+        overdueCount,
+        completionRate,
+      })
+      aiInsights = {
+        summary: insights.summary,
+        recommendations: insights.recommendations,
+        generatedAt: insights.generatedAt.toISOString(),
+      }
+    } catch {
+      // Provider threw unexpectedly. Per AIProvider contract, implementations must
+      // catch their own errors internally. If they don't, aiInsights stays null.
     }
 
     return {
