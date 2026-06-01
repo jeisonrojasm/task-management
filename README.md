@@ -182,6 +182,22 @@ El detalle de proyecto muestra insights generados sobre las métricas del proyec
 - **Provider:** se resuelve en el composition root (`main.ts`) — `OpenAIProvider` (modelo `gpt-4o-mini`) cuando `OPENAI_API_KEY` está presente, o `MockAIProvider` por defecto.
 - **Tolerancia a fallos:** si el provider falla, el use case deja `aiInsights` en `null` (try/catch) y el panel muestra el estado "no disponible".
 
+> El sistema funciona sin credenciales externas: cuando `OPENAI_API_KEY` no está definida se usa `MockAIProvider`. Si la variable está presente, se selecciona automáticamente `OpenAIProvider` (`gpt-4o-mini`). Ambas modalidades son intercambiables sin cambios en el código.
+
+### Probar con OpenAI real (opcional)
+
+1. Crear una API Key en [OpenAI Platform](https://platform.openai.com/api-keys).
+2. Copiarla al archivo `.env`:
+
+```env
+OPENAI_API_KEY=sk-...
+```
+
+3. Reiniciar los contenedores.
+4. Abrir la vista de detalle de un proyecto para ver los insights generados por OpenAI.
+
+Más información en [platform.openai.com](https://platform.openai.com).
+
 ---
 
 ## Estructura del proyecto
