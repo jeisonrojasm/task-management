@@ -12,16 +12,23 @@ API REST (Node + Express + TypeScript sobre PostgreSQL) y dashboard en React 18 
 
 **1. Requisitos previos**
 
+- **Git** — para clonar el repositorio.
 - **Docker** (incluye Docker Compose) — ejecuta toda la aplicación.
 - **Node 22** y **pnpm** — solo para tests, lint y scripts fuera de Docker. Node 22 está fijado por Docker y `.nvmrc`; mínimo soportado por el toolchain: **Node 20.19+**.
 
 **2. Configuración**
 
+Copia las variables de entorno de ejemplo a `.env` (Postgres, puertos, CORS) con valores listos para desarrollo.
+
+**Linux / macOS / Git Bash / PowerShell:**
 ```bash
 cp .env.example .env
 ```
 
-Copia las variables de entorno de ejemplo a `.env` (Postgres, puertos, CORS) con valores listos para desarrollo.
+**Windows (CMD):**
+```cmd
+copy .env.example .env
+```
 
 **3. Arranque**
 
@@ -214,15 +221,24 @@ task-management/
 | `cd apps/backend && pnpm db:seed` | Regenera los datos de demo (destructivo: borra y vuelve a sembrar). |
 | `cd apps/backend && pnpm db:studio` | Abre Prisma Studio. |
 
-**Variables de entorno.** Para levantar la app basta `cp .env.example .env` (lo usa Docker). Para correr los tests o el tooling de Prisma **en host** (fuera de Docker), copia primero las plantillas del backend:
+**Variables de entorno.** Para levantar la app basta copiar `.env.example` a `.env` (lo usa Docker). Para correr los tests o el tooling de Prisma **en host** (fuera de Docker), copia primero las plantillas del backend.
 
+**Linux / macOS / Git Bash / PowerShell:**
 ```bash
-# Tests (usan una BD de test separada en localhost):
+# Tests (BD de test separada en localhost):
 cp apps/backend/.env.test.example apps/backend/.env.test
 pnpm test
 
 # Tooling de Prisma en host (db:studio, db:migrate, db:seed):
 cp apps/backend/.env.example apps/backend/.env
+```
+
+**Windows (CMD):**
+```cmd
+copy apps\backend\.env.test.example apps\backend\.env.test
+pnpm test
+
+copy apps\backend\.env.example apps\backend\.env
 ```
 
 ---
