@@ -1,8 +1,10 @@
+import type { ProjectStatus } from '@task-manager/shared'
+
 export interface Project {
   id: string
   name: string
   description: string | null
-  status: 'ACTIVE' | 'ARCHIVED'
+  status: ProjectStatus
   createdAt: string
   updatedAt: string
 }
@@ -12,7 +14,7 @@ export interface ProjectSummary extends Project {
 }
 
 export interface ProjectFilters {
-  status?: 'ACTIVE' | 'ARCHIVED'
+  status?: ProjectStatus
   page?: number
   limit?: number
 }
