@@ -6,7 +6,7 @@ import { ProjectDetailPage } from '@/features/projects/ProjectDetailPage'
 import { ProjectsPage } from '@/features/projects/ProjectsPage'
 
 function NotFoundPage() {
-  return <div className="p-8 text-slate-500">404 — Page not found</div>
+  return <div className="p-8 text-slate-500">404 — Página no encontrada</div>
 }
 
 export function AppRouter() {

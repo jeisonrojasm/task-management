@@ -12,7 +12,7 @@ export function Sidebar() {
       <button
         onClick={toggleSidebar}
         className="fixed left-4 top-4 z-50 rounded-md p-2 text-slate-600 hover:bg-slate-100 md:hidden"
-        aria-label="Toggle sidebar"
+        aria-label="Abrir/cerrar menú lateral"
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
