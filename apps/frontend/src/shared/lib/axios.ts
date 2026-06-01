@@ -7,6 +7,25 @@ export const apiClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+function toCamelCase(key: string): string {
+  if (key === key.toUpperCase()) {
+    return key
+  }
+  return key.replace(/_([a-z])/g, (_match: string, char: string) => char.toUpperCase())
+}
+
+function camelizeKeys(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(camelizeKeys)
+  }
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [toCamelCase(k), camelizeKeys(v)]),
+    )
+  }
+  return value
+}
+
 apiClient.interceptors.response.use(
   (response) => {
     if (import.meta.env.DEV) {
@@ -15,6 +34,7 @@ apiClient.interceptors.response.use(
         console.info(`[correlation-id] ${correlationId}`)
       }
     }
+    response.data = camelizeKeys(response.data)
     return response
   },
   (error: AxiosError<{ error: { code: string; message: string; details: unknown } }>) => {
