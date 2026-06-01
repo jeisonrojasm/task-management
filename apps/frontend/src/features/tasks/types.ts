@@ -1,5 +1,6 @@
-export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE' | 'CANCELLED'
-export type Priority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+import type { TaskStatus, Priority } from '@task-manager/shared'
+
+export type { TaskStatus, Priority }
 
 export const VALID_TRANSITIONS: Record<TaskStatus, TaskStatus[]> = {
   TODO: ['IN_PROGRESS', 'CANCELLED'],
