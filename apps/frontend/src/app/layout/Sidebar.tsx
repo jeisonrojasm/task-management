@@ -53,7 +53,7 @@ export function Sidebar() {
             }
           >
             <FolderKanban className="h-4 w-4" />
-            Projects
+            Proyectos
           </NavLink>
         </nav>
       </aside>

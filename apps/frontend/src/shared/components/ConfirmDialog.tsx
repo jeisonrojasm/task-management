@@ -34,10 +34,10 @@ export function ConfirmDialog({
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-            Cancel
+            Cancelar
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={loading}>
-            {loading ? 'Loading...' : 'Confirm'}
+            {loading ? 'Cargando...' : 'Confirmar'}
           </Button>
         </DialogFooter>
       </DialogContent>
