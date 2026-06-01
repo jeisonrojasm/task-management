@@ -28,7 +28,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   render(): ReactNode {
     if (this.state.hasError) {
-      return this.props.fallback ?? <PageError message="Something went wrong." />
+      return this.props.fallback ?? <PageError message="Algo salió mal." />
     }
     return this.props.children
   }

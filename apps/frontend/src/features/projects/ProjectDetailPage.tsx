@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { AlertTriangle, ListChecks } from 'lucide-react'
 
 import {
   CreateTaskDialog,
@@ -8,14 +9,38 @@ import {
   useTaskFilters,
   type TaskFilters,
 } from '../tasks'
+import {
+  AIInsightsPanel,
+  CompletionRateCard,
+  DistributionChart,
+  OverdueAlert,
+  StatsCard,
+  useProjectStats,
+} from '../dashboard'
 
 import { useArchiveProject, useProject } from './api/projects.api'
 import { ProjectStatusBadge } from './components/ProjectStatusBadge'
 
 import { Button } from '@/shared/components/ui/button'
 import { ConfirmDialog } from '@/shared/components/ConfirmDialog'
+import { ErrorBoundary } from '@/shared/components/ErrorBoundary'
 import { LoadingSkeleton } from '@/shared/components/LoadingSkeleton'
 import { PageError } from '@/shared/components/PageError'
+
+const STATUS_COLOR_MAP: Record<string, string> = {
+  TODO: 'bg-slate-400',
+  IN_PROGRESS: 'bg-blue-500',
+  IN_REVIEW: 'bg-amber-500',
+  DONE: 'bg-green-500',
+  CANCELLED: 'bg-red-400',
+}
+
+const PRIORITY_COLOR_MAP: Record<string, string> = {
+  LOW: 'bg-slate-400',
+  MEDIUM: 'bg-blue-500',
+  HIGH: 'bg-orange-500',
+  CRITICAL: 'bg-red-500',
+}
 
 export function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>()
@@ -25,6 +50,12 @@ export function ProjectDetailPage() {
 
   const { data: project, isLoading, isError, refetch } = useProject(projectId)
   const { mutate: archiveProject, isPending: isArchiving } = useArchiveProject()
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    isError: statsError,
+    refetch: refetchStats,
+  } = useProjectStats(projectId)
 
   const { status, priority, page, setStatus, setPriority, setPage, reset } = useTaskFilters()
   const filters: TaskFilters = {
@@ -91,8 +122,55 @@ export function ProjectDetailPage() {
         )}
       </section>
 
-      <section>
-        <p className="text-sm text-slate-400">Estadísticas e información — próximamente</p>
+      <section className="space-y-6">
+        <h2 className="text-lg font-semibold text-slate-800">Estadísticas</h2>
+
+        {statsLoading && <LoadingSkeleton lines={3} />}
+
+        {statsError && (
+          <PageError
+            message="No se pudieron cargar las estadísticas."
+            onRetry={() => void refetchStats()}
+          />
+        )}
+
+        {!statsLoading && !statsError && stats !== undefined && (
+          <div className="space-y-6">
+            {stats.overdueCount > 0 && <OverdueAlert overdueCount={stats.overdueCount} />}
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <StatsCard title="Total de tareas" value={stats.taskCount} icon={ListChecks} />
+              <CompletionRateCard rate={stats.completionRate} />
+              <StatsCard
+                title="Vencidas"
+                value={stats.overdueCount}
+                icon={AlertTriangle}
+                variant={stats.overdueCount > 0 ? 'warning' : 'default'}
+              />
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div className="space-y-3 rounded-lg border bg-white p-5 shadow-sm">
+                <h3 className="text-sm font-semibold text-slate-600">Por estado</h3>
+                <DistributionChart distribution={stats.byStatus} colorMap={STATUS_COLOR_MAP} />
+              </div>
+              <div className="space-y-3 rounded-lg border bg-white p-5 shadow-sm">
+                <h3 className="text-sm font-semibold text-slate-600">Por prioridad</h3>
+                <DistributionChart distribution={stats.byPriority} colorMap={PRIORITY_COLOR_MAP} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!statsError && (
+          <div className="rounded-lg border bg-white p-5 shadow-sm">
+            <ErrorBoundary
+              fallback={<PageError message="No se pudieron cargar los análisis de IA" />}
+            >
+              <AIInsightsPanel projectId={project.id} />
+            </ErrorBoundary>
+          </div>
+        )}
       </section>
 
       {projectId !== undefined && (
