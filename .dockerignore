@@ -1,0 +1,45 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies — rebuilt inside the image
+**/node_modules
+.pnpm-store
+
+# Build artefacts
+**/dist
+**/build
+**/*.tsbuildinfo
+
+# Test artefacts
+**/coverage
+
+# Environment — secrets must never enter the build context
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+pino-*.log
+
+# Docker files are not needed inside the build context
+**/Dockerfile
+docker-compose.yml
+.dockerignore
+
+# CI / repo tooling
+.github
+.husky
+
+# Project docs and meta — not needed at runtime
+docs/
+memory/
+CLAUDE.md
+README.md

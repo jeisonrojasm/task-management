@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor User
+    participant UI as ProjectDetailPage / AIInsightsPanel
+    participant Q as useProjectStats (TanStack Query)
+    participant AX as Axios apiClient
+    participant API as Express + ProjectController.getStats
+    participant UC as GetProjectStatsUseCase
+    participant TR as TaskRepository (Prisma)
+    participant AIP as AIProvider port
+    participant OAI as OpenAI API
+
+    User->>UI: Open project detail
+    UI->>Q: useProjectStats(projectId)
+    Q->>AX: GET /api/v1/projects/:id/stats
+    AX->>API: HTTP request
+    API->>UC: execute({ projectId })
+    UC->>TR: count + status/priority distribution + overdue
+    TR-->>UC: metrics
+    UC->>AIP: generateProjectInsights(context)
+    alt OPENAI_API_KEY set -> OpenAIProvider
+        AIP->>OAI: chat.completions (gpt-4o-mini, json_object)
+        OAI-->>AIP: JSON { summary, recommendations }
+    else default -> MockAIProvider
+        AIP->>AIP: build deterministic insights
+    end
+    AIP-->>UC: AIInsights (summary, recommendations, generatedAt)
+    Note over UC: try/catch — on failure aiInsights = null
+    UC-->>API: ProjectStatsOutput (+ aiInsights)
+    API->>API: mapProjectStats -> { data: { ..., ai_insights } }
+    API-->>AX: 200 JSON
+    AX-->>Q: ProjectStats
+    Q-->>UI: Render summary + recommendations (or empty/error state)
