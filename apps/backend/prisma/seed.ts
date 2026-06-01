@@ -6,13 +6,9 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-const prisma = new PrismaClient();
-
-async function main(): Promise<void> {
-  await prisma.task.deleteMany();
-  await prisma.project.deleteMany();
-  console.log('Database cleaned');
-
+// Pure data creation — no deletes. Safe to run against an empty database.
+// Reused by the conditional boot seed (prisma/seed-if-empty.ts).
+export async function seedDatabase(prisma: PrismaClient): Promise<void> {
   const platformRedesign = await prisma.project.create({
     data: {
       name: 'Modernización del Sistema de Recaudo',
@@ -272,16 +268,27 @@ async function main(): Promise<void> {
   });
 
   const taskCount = await prisma.task.count();
-  console.log(`Created ${taskCount} tasks`);
-  console.log('Seed completed successfully');
+  console.log(`Created 3 projects and ${taskCount} tasks`);
 }
 
-main()
-  .then(async () => {
+// Destructive regenerate: wipe, then reseed. This is what `pnpm db:seed` runs (manual tool).
+async function main(): Promise<void> {
+  const prisma = new PrismaClient();
+  try {
+    await prisma.task.deleteMany();
+    await prisma.project.deleteMany();
+    console.log('Database cleaned');
+    await seedDatabase(prisma);
+    console.log('Seed completed successfully');
+  } finally {
     await prisma.$disconnect();
-  })
-  .catch(async (error: unknown) => {
+  }
+}
+
+// Run only when executed directly (e.g. `prisma db seed`), never when imported.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((error: unknown) => {
     console.error(error);
-    await prisma.$disconnect();
     process.exit(1);
   });
+}

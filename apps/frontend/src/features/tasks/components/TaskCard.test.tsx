@@ -54,9 +54,9 @@ describe('TaskCard', () => {
     const user = userEvent.setup()
     const { onStatusChange } = renderCard({ status: 'TODO' })
 
-    // El trigger del dropdown es el único botón con aria-expanded (Radix).
+    // The dropdown trigger is the only button with aria-expanded (Radix).
     await user.click(screen.getByRole('button', { expanded: false }))
-    // TODO permite IN_PROGRESS ('En progreso') y CANCELLED ('Cancelada').
+    // TODO allows IN_PROGRESS ('En progreso') and CANCELLED ('Cancelada').
     await user.click(await screen.findByText('En progreso'))
 
     expect(onStatusChange).toHaveBeenCalledWith('task-1', 'IN_PROGRESS')
@@ -64,7 +64,7 @@ describe('TaskCard', () => {
 
   it('solo muestra transiciones válidas: una tarea DONE no expone el menú de transición', () => {
     renderCard({ status: 'DONE' })
-    // DONE no tiene transiciones válidas → no se renderiza el trigger del dropdown.
+    // DONE has no valid transitions → the dropdown trigger is not rendered.
     expect(screen.queryByRole('button', { expanded: false })).not.toBeInTheDocument()
   })
 })

@@ -11,8 +11,8 @@ import { mockProjectA, mockProjects } from '@/test/handlers'
 import { createTestQueryClient } from '@/test/renderWithProviders'
 import { useToast } from '@/shared/hooks/useToast'
 
-// Sonda mínima: se suscribe al store real de toasts y expone el título como
-// texto visible, sin depender de los primitivos Radix del Toaster.
+// Minimal probe: subscribes to the real toast store and exposes the title as
+// visible text, without depending on the Toaster's Radix primitives.
 function ToastProbe() {
   const { toasts } = useToast()
   return (
@@ -72,7 +72,7 @@ describe('useCreateProject', () => {
     await waitFor(() => {
       expect(result.current.create.isSuccess).toBe(true)
     })
-    // La invalidación de ['projects'] fuerza un refetch de la query activa.
+    // Invalidating ['projects'] forces a refetch of the active query.
     await waitFor(() => {
       expect(getCalls).toBe(2)
     })
@@ -108,7 +108,7 @@ describe('useCreateProject', () => {
       expect(result.current.create.isError).toBe(true)
     })
     expect(await screen.findByText('Error al crear el proyecto')).toBeInTheDocument()
-    expect(getCalls).toBe(1) // onError no invalida → sin refetch
+    expect(getCalls).toBe(1) // onError does not invalidate → no refetch
   })
 })
 

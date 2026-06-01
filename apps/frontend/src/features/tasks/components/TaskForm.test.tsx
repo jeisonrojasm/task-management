@@ -35,7 +35,7 @@ describe('TaskForm', () => {
     await user.click(screen.getByRole('button', { name: 'Guardar' }))
 
     await waitFor(() => {
-      // priority por defecto MEDIUM; description y dueDate vacíos se omiten.
+      // priority defaults to MEDIUM; empty description and dueDate are omitted.
       expect(onSubmit).toHaveBeenCalledWith({
         projectId,
         title: 'Nueva tarea',

@@ -46,7 +46,7 @@ describe('useDebounce', () => {
       vi.advanceTimersByTime(300)
     })
 
-    // Cambia antes de cumplir el delay: el timer anterior se cancela.
+    // Changes before the delay elapses: the previous timer is cancelled.
     rerender({ value: 'c' })
     act(() => {
       vi.advanceTimersByTime(300)

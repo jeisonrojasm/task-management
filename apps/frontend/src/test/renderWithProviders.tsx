@@ -4,13 +4,13 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { MemoryRouter } from 'react-router-dom'
 
-// Helper de render para tests. NO es un componente shadcn, por lo que sigue la
-// convención camelCase del proyecto (constraint §4.3): export `renderWithProviders`.
+// Render helper for tests. It is NOT a shadcn component, so it follows the
+// project's camelCase convention: export `renderWithProviders`.
 
-// gcTime por defecto en 0 (cliente fresco, sin estado compartido entre tests).
-// Los tests que inspeccionan el cache sin un observer montado deben pasar un
-// gcTime mayor (p. ej. Infinity): con gcTime 0 una query sin observers se
-// recolecta de inmediato y `getQueryData` devolvería undefined.
+// gcTime defaults to 0 (fresh client, no state shared between tests).
+// Tests that inspect the cache without a mounted observer must pass a
+// larger gcTime (e.g. Infinity): with gcTime 0 a query without observers is
+// garbage-collected immediately and `getQueryData` would return undefined.
 export function createTestQueryClient(gcTime = 0): QueryClient {
   return new QueryClient({
     defaultOptions: {
@@ -44,7 +44,7 @@ export function renderWithProviders(ui: ReactElement, options: RenderOptions = {
   }
 }
 
-// Wrapper mínimo (solo QueryClient) para tests de hooks con `renderHook`.
+// Minimal wrapper (QueryClient only) for hook tests using `renderHook`.
 export function createQueryWrapper(queryClient: QueryClient) {
   return function Wrapper({ children }: { children: ReactNode }) {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

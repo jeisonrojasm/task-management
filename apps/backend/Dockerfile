@@ -15,6 +15,8 @@ COPY packages/shared ./packages/shared
 COPY apps/backend ./apps/backend
 WORKDIR /workspace/apps/backend
 RUN pnpm exec prisma generate
+# Entrypoint runs migrate deploy + conditional seed, then execs the CMD (the server).
+ENTRYPOINT ["sh", "docker-entrypoint.sh"]
 CMD ["pnpm", "exec", "tsx", "watch", "src/main.ts"]
 
 FROM installer AS builder

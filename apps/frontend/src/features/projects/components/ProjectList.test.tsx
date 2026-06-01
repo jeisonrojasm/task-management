@@ -35,7 +35,7 @@ function renderList() {
 describe('ProjectList (estados async)', () => {
   it('muestra LoadingSkeleton mientras la query está pendiente', () => {
     const { container } = renderList()
-    // El esqueleto es lo único observable mientras carga: aún no hay datos ni vacío.
+    // The skeleton is the only thing observable while loading: no data or empty state yet.
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
     expect(screen.queryByText('Proyecto Alfa')).not.toBeInTheDocument()
   })

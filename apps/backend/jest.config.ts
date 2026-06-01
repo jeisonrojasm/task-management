@@ -4,6 +4,7 @@ export default {
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: { '^(\\.{1,2}/.*)\\.js$': '$1' },
   testMatch: ['**/*.spec.ts'],
+  globalSetup: '<rootDir>/jest.global-setup.cjs',
   setupFiles: ['<rootDir>/jest.env.setup.cjs'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { useESM: true, tsconfig: 'tsconfig.test.json' }],
