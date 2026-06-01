@@ -35,8 +35,17 @@ export function ProjectForm({
     },
   })
 
+  function handleFormSubmit(values: ProjectFormValues) {
+    onSubmit({
+      name: values.name,
+      ...(values.description !== undefined && values.description !== ''
+        ? { description: values.description }
+        : {}),
+    })
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
       <div className="space-y-1">
         <Label htmlFor="name">Nombre</Label>
         <Input

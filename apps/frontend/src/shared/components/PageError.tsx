@@ -5,7 +5,7 @@ interface PageErrorProps {
   onRetry?: () => void
 }
 
-export function PageError({ message = 'Something went wrong.', onRetry }: PageErrorProps) {
+export function PageError({ message = 'Algo salió mal.', onRetry }: PageErrorProps) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
       <AlertCircle className="h-10 w-10 text-red-500" />

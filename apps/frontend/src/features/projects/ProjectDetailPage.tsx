@@ -1,6 +1,14 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import {
+  CreateTaskDialog,
+  TaskFiltersBar,
+  TaskList,
+  useTaskFilters,
+  type TaskFilters,
+} from '../tasks'
+
 import { useArchiveProject, useProject } from './api/projects.api'
 import { ProjectStatusBadge } from './components/ProjectStatusBadge'
 
@@ -13,9 +21,18 @@ export function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>()
   const navigate = useNavigate()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [createTaskOpen, setCreateTaskOpen] = useState(false)
 
   const { data: project, isLoading, isError, refetch } = useProject(projectId)
   const { mutate: archiveProject, isPending: isArchiving } = useArchiveProject()
+
+  const { status, priority, page, setStatus, setPriority, setPage, reset } = useTaskFilters()
+  const filters: TaskFilters = {
+    ...(status !== undefined && { status }),
+    ...(priority !== undefined && { priority }),
+    page,
+    limit: 20,
+  }
 
   if (isLoading) {
     return (
@@ -30,6 +47,9 @@ export function ProjectDetailPage() {
   }
 
   function handleArchive() {
+    if (project === undefined) {
+      return
+    }
     archiveProject(project.id, {
       onSuccess: () => void navigate('/projects'),
     })
@@ -50,15 +70,38 @@ export function ProjectDetailPage() {
         </div>
       </div>
 
-      <section>
-        <p className="text-sm text-slate-400">Tareas — próximamente (SESSION-18)</p>
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-slate-800">Tareas</h2>
+          <Button size="sm" onClick={() => setCreateTaskOpen(true)}>
+            Agregar tarea
+          </Button>
+        </div>
+
+        <TaskFiltersBar
+          status={status}
+          priority={priority}
+          onStatusChange={setStatus}
+          onPriorityChange={setPriority}
+          onClear={reset}
+        />
+
+        {projectId !== undefined && (
+          <TaskList projectId={projectId} filters={filters} onPageChange={setPage} />
+        )}
       </section>
 
       <section>
-        <p className="text-sm text-slate-400">
-          Estadísticas e información — próximamente (SESSION-19)
-        </p>
+        <p className="text-sm text-slate-400">Estadísticas e información — próximamente</p>
       </section>
+
+      {projectId !== undefined && (
+        <CreateTaskDialog
+          projectId={projectId}
+          open={createTaskOpen}
+          onOpenChange={setCreateTaskOpen}
+        />
+      )}
 
       <ConfirmDialog
         open={confirmOpen}

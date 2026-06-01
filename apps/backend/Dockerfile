@@ -1,5 +1,6 @@
 FROM node:22-alpine AS base
 WORKDIR /workspace
+RUN ln -s /usr/lib/libssl.so.3 /lib/libssl.so.3
 RUN corepack enable pnpm
 
 FROM base AS installer
@@ -13,6 +14,7 @@ COPY tsconfig.base.json ./
 COPY packages/shared ./packages/shared
 COPY apps/backend ./apps/backend
 WORKDIR /workspace/apps/backend
+RUN pnpm exec prisma generate
 CMD ["pnpm", "exec", "tsx", "watch", "src/main.ts"]
 
 FROM installer AS builder
@@ -20,6 +22,7 @@ COPY tsconfig.base.json ./
 COPY packages/shared ./packages/shared
 COPY apps/backend ./apps/backend
 WORKDIR /workspace/apps/backend
+RUN pnpm exec prisma generate
 RUN pnpm exec tsc -p tsconfig.build.json
 
 # pnpm deploy produces a self-contained bundle: resolves workspace packages
