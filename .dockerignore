@@ -39,7 +39,9 @@ docker-compose.yml
 .husky
 
 # Project docs and meta — not needed at runtime
-docs/
+# (root design-notes folder only — anchored so it never matches source dirs
+# such as apps/backend/src/presentation/http/docs/)
+/docs/
 memory/
 CLAUDE.md
 README.md

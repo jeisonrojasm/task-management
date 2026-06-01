@@ -37,8 +37,9 @@ pino-*.log
 # Test coverage
 coverage/
 
-# Docs
-docs/
+# Docs (root design-notes folder only — must NOT match source dirs like
+# apps/backend/src/presentation/http/docs/). Anchored with a leading slash.
+/docs/
 
 # Claude-related files
 CLAUDE.md
