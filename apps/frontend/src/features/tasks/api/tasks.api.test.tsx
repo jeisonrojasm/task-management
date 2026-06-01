@@ -47,8 +47,8 @@ describe('useUpdateTaskStatus (optimistic update)', () => {
       }),
     )
 
-    // gcTime Infinity: la query sembrada no tiene observer montado; con gcTime 0
-    // se recolectaría antes de poder inspeccionar el cache.
+    // gcTime Infinity: the seeded query has no mounted observer; with gcTime 0
+    // it would be garbage-collected before the cache could be inspected.
     const queryClient = createTestQueryClient(Infinity)
     queryClient.setQueryData(tasksKey, seedPage)
 
@@ -60,7 +60,7 @@ describe('useUpdateTaskStatus (optimistic update)', () => {
       result.current.mutate({ taskId: 'task-1', newStatus: 'IN_PROGRESS', projectId })
     })
 
-    // Mientras la mutación sigue pendiente, el cache ya refleja el valor optimista.
+    // While the mutation is still pending, the cache already reflects the optimistic value.
     await waitFor(() => {
       expect(readStatus(queryClient)).toBe('IN_PROGRESS')
     })
@@ -72,8 +72,8 @@ describe('useUpdateTaskStatus (optimistic update)', () => {
       http.patch('/api/v1/tasks/:taskId/status', () => new HttpResponse(null, { status: 500 })),
     )
 
-    // gcTime Infinity: la query sembrada no tiene observer montado; con gcTime 0
-    // se recolectaría antes de poder inspeccionar el cache.
+    // gcTime Infinity: the seeded query has no mounted observer; with gcTime 0
+    // it would be garbage-collected before the cache could be inspected.
     const queryClient = createTestQueryClient(Infinity)
     queryClient.setQueryData(tasksKey, seedPage)
 
@@ -88,7 +88,7 @@ describe('useUpdateTaskStatus (optimistic update)', () => {
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
-    // Rollback: vuelve al status original.
+    // Rollback: returns to the original status.
     expect(readStatus(queryClient)).toBe('TODO')
   })
 
@@ -98,8 +98,8 @@ describe('useUpdateTaskStatus (optimistic update)', () => {
         const body = (await request.json()) as { status: string }
         return HttpResponse.json({ ...seedTask, status: body.status })
       }),
-      // Tras onSettled → invalidate → refetch, el servidor es la fuente de verdad.
-      // El título distinto prueba que el valor proviene del refetch, no del optimismo.
+      // After onSettled → invalidate → refetch, the server is the source of truth.
+      // The different title proves the value comes from the refetch, not the optimism.
       http.get('/api/v1/projects/:projectId/tasks', () =>
         HttpResponse.json({
           data: [{ ...seedTask, title: 'Tarea canónica del servidor', status: 'IN_PROGRESS' }],

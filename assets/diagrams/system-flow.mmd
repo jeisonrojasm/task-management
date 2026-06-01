@@ -1,0 +1,39 @@
+flowchart TD
+    U([Usuario])
+
+    subgraph FE["Frontend — React SPA"]
+        PV["Proyectos<br/>crear · ver/listar · editar · archivar"]
+        TV["Tareas (dentro de un proyecto)<br/>crear · cambiar estado · eliminar"]
+        DV["Dashboard / Detalle de proyecto<br/>estadísticas, distribuciones y métricas"]
+    end
+
+    U --> PV
+    U --> TV
+    U --> DV
+
+    subgraph BE["Backend — API REST (/api/v1)"]
+        PA["Proyectos<br/>POST /projects · GET /projects(/:id)<br/>PUT /projects/:id · DELETE /projects/:id (archivar)"]
+        TA["Tareas<br/>GET /projects/:id/tasks · POST /tasks<br/>PATCH /tasks/:id/status · DELETE /tasks/:id"]
+        SA["Estadísticas<br/>GET /projects/:id/stats<br/>conteos · distribución por estado y prioridad<br/>tareas vencidas · % completado"]
+    end
+
+    PV -->|"crear / ver / editar / archivar"| PA
+    TV -->|"crear / cambiar estado / eliminar"| TA
+    DV -->|"consultar métricas"| SA
+
+    DB[("PostgreSQL 15<br/>(vía Prisma)")]
+    PA --> DB
+    TA --> DB
+    SA -->|"agrega métricas"| DB
+
+    subgraph AI["AI Insights"]
+        AIP["AI Provider<br/>MockAIProvider por defecto<br/>OpenAIProvider si OPENAI_API_KEY"]
+        OAI["OpenAI API<br/>(gpt-4o-mini)"]
+    end
+
+    SA -->|"genera insights sobre las métricas"| AIP
+    AIP -->|"solo si OpenAI"| OAI
+    OAI -->|"summary + recommendations"| AIP
+    AIP -->|"insights"| SA
+    SA -->|"stats + ai_insights"| DV
+    DV -->|"resultado"| U

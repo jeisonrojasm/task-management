@@ -57,7 +57,7 @@ describe('TaskList (estados async)', () => {
 
   it('mantiene los datos disponibles (smoke de la lista poblada)', async () => {
     renderTaskList()
-    // Confirma que renderiza la tarjeta de la tarea que devuelve el handler.
+    // Confirms it renders the card for the task returned by the handler.
     expect(await screen.findByText(mockTask.title)).toBeInTheDocument()
   })
 })

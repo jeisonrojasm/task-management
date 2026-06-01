@@ -1,0 +1,23 @@
+erDiagram
+    projects ||--o{ tasks : "has (FK project_id, ON DELETE CASCADE)"
+
+    projects {
+        uuid id PK "gen_random_uuid()"
+        varchar name "VARCHAR(255), NOT NULL"
+        text description "nullable"
+        ProjectStatus status "ACTIVE | ARCHIVED (default ACTIVE)"
+        timestamptz created_at "default now()"
+        timestamptz updated_at "Prisma @updatedAt"
+    }
+
+    tasks {
+        uuid id PK "gen_random_uuid()"
+        uuid project_id FK "references projects.id"
+        varchar title "VARCHAR(255), NOT NULL"
+        text description "nullable"
+        TaskStatus status "TODO | IN_PROGRESS | IN_REVIEW | DONE | CANCELLED (default TODO)"
+        Priority priority "LOW | MEDIUM | HIGH | CRITICAL (default MEDIUM)"
+        date due_date "nullable"
+        timestamptz created_at "default now()"
+        timestamptz updated_at "Prisma @updatedAt"
+    }

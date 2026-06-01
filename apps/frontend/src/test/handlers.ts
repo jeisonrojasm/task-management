@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw'
 
-// Datos mock en snake_case — el interceptor de respuesta de Axios
-// (src/shared/lib/axios.ts) los cameliza antes de llegar a los componentes.
-// Mantener snake_case aquí mantiene el contrato fiel al backend real.
+// Mock data in snake_case — the Axios response interceptor
+// (src/shared/lib/axios.ts) camelizes it before it reaches the components.
+// Keeping snake_case here keeps the contract faithful to the real backend.
 
 export const mockProjectA = {
   id: '11111111-1111-1111-1111-111111111111',

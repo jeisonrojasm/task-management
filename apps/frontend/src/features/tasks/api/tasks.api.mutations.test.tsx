@@ -11,7 +11,7 @@ import { mockTask, mockTasks } from '@/test/handlers'
 import { createTestQueryClient } from '@/test/renderWithProviders'
 import { useToast } from '@/shared/hooks/useToast'
 
-// Sonda mínima de toasts (store real), sin Radix.
+// Minimal toast probe (real store), without Radix.
 function ToastProbe() {
   const { toasts } = useToast()
   return (

@@ -4,8 +4,8 @@ import { afterAll, afterEach, beforeAll } from 'vitest'
 
 import { server } from './server'
 
-// jsdom no implementa las APIs de puntero/scroll que Radix UI usa internamente
-// (DropdownMenu, Dialog). Sin estos no-ops, abrir un menú en los tests lanza.
+// jsdom does not implement the pointer/scroll APIs that Radix UI uses internally
+// (DropdownMenu, Dialog). Without these no-ops, opening a menu in tests throws.
 Element.prototype.hasPointerCapture = (): boolean => false
 Element.prototype.setPointerCapture = (): void => undefined
 Element.prototype.releasePointerCapture = (): void => undefined
